@@ -98,7 +98,7 @@ public class AuthService implements IAuthService{
         requestBody.add("password", password);
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
         try {
-            ResponseEntity<LoginResponse> response = restTemplate.postForEntity("http://localhost:8080/realms/esprit-piazza/protocol/openid-connect/token", httpEntity, LoginResponse.class);
+            ResponseEntity<LoginResponse> response = restTemplate.postForEntity("http://localhost:8080/realms/JobBoardKeycloack/protocol/openid-connect/token", httpEntity, LoginResponse.class);
             return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
         } catch (HttpClientErrorException ex) {
             ResponseMessage message = new ResponseMessage();
@@ -123,7 +123,7 @@ public class AuthService implements IAuthService{
             map.add("client_secret", secret);
             map.add("refresh_token", token);
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
-            restTemplate.postForEntity("http://localhost:8080/realms/esprit-piazza/protocol/openid-connect/logout", httpEntity, ResponseMessage.class);
+            restTemplate.postForEntity("http://localhost:8080/realms/JobBoardKeycloack/protocol/openid-connect/logout", httpEntity, ResponseMessage.class);
             message.setMessage("Logged out successfully");
             return new ResponseEntity<>(message, HttpStatus.OK);
         } catch (HttpClientErrorException ex) {
@@ -145,6 +145,8 @@ public class AuthService implements IAuthService{
             credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
             List<CredentialRepresentation> list = new ArrayList<>();
             user.setUsername(userRegistration.getUsername());
+            user.setFirstName(userRegistration.getFirstName());
+            user.setLastName(userRegistration.getLastName());
             user.setEmail(userRegistration.getEmail());
             credentialRepresentation.setValue(userRegistration.getPassword());
             list.add(credentialRepresentation);
@@ -166,7 +168,7 @@ public class AuthService implements IAuthService{
                     userData.setImage("user.png");
                     userRepository.save(userData);
 
-                    //emailVerification(userId);
+                    emailVerification(userId);
                     assignRole(userId,userRegistration.getRole().toString());
                     message.setMessage("Account created successfully");
                 }
@@ -182,8 +184,6 @@ public class AuthService implements IAuthService{
             return new Object[]{HttpStatus.INTERNAL_SERVER_ERROR.value(), message};
         }
     }
-
-
 
     @Override
     public void emailVerification(String userId){
@@ -394,7 +394,7 @@ public class AuthService implements IAuthService{
         requestBody.add("refresh_token", token);
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
         try {
-            ResponseEntity<LoginResponse> response = restTemplate.postForEntity("http://localhost:8082/realms/esprit-piazza/protocol/openid-connect/token", httpEntity, LoginResponse.class);
+            ResponseEntity<LoginResponse> response = restTemplate.postForEntity("http://localhost:8082/realms/JobBoardKeycloack/protocol/openid-connect/token", httpEntity, LoginResponse.class);
             return new ResponseEntity<>(response.getBody(), HttpStatus.OK);
         } catch (HttpClientErrorException ex) {
             ResponseMessage message = new ResponseMessage();

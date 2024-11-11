@@ -21,6 +21,8 @@ public class User implements Serializable {
     @Column(name = "id")
     private String id;
     public String username;
+    public String firstName;
+    public String lastName;
     public String password;
     public String email;
     public String image;
