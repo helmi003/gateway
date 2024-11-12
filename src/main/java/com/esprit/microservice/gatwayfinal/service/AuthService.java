@@ -2,6 +2,7 @@ package com.esprit.microservice.gatwayfinal.service;
 
 import com.esprit.microservice.gatwayfinal.dao.LoginResponse;
 import com.esprit.microservice.gatwayfinal.dao.ResponseMessage;
+import com.esprit.microservice.gatwayfinal.entity.Role;
 import com.esprit.microservice.gatwayfinal.entity.User;
 import com.esprit.microservice.gatwayfinal.repository.UserRepository;
 import com.google.zxing.BarcodeFormat;
@@ -207,7 +208,7 @@ public class AuthService implements IAuthService{
 
     @Override
     public List<User> getAllUsers() {
-        return (List<User>) userRepository.findAll();
+        return userRepository.findUsersExcludingAdminAndApproved();
     }
 
     @Override
@@ -275,8 +276,8 @@ public class AuthService implements IAuthService{
             if(!user.isApprove()){
                 message.setMessage("Not approved");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
-            }else if (!user.isBlock()){
-                message.setMessage("This account is blocker for some reasons. Contact the administration");
+            }else if (user.isBlock()){
+                message.setMessage("This account is blocked for some reasons. Contact the administration");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
             }
         }else{
@@ -293,6 +294,9 @@ public class AuthService implements IAuthService{
             User user = userRepository.findById(userId).orElse(null);
             user.setApprove(true);
             userRepository.save(user);
+            if(user.getRole()== Role.Student){
+                sendEmailToUser(user.getId());
+            }
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             message.setMessage(e.getMessage());
